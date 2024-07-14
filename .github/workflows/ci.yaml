@@ -1,0 +1,71 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - main
+    paths-ignore:
+      - ".gitignore"
+      - "README.md"
+  pull_request:
+    paths-ignore:
+      - ".gitignore"
+      - "README.md"
+
+env:
+  go-version: "1.22"
+
+permissions:
+  contents: read
+
+jobs:
+  Build:
+    runs-on: ubuntu-latest
+    concurrency:
+      group: ${{ github.event_name }}-${{ github.workflow }}-${{ github.ref_name }}-build
+      cancel-in-progress: true
+    timeout-minutes: 20
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Build and Install
+      env:
+        GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      run: make install
+
+  Lint:
+    runs-on: ubuntu-latest
+    concurrency:
+      group: ${{ github.event_name }}-${{ github.workflow }}-${{ github.ref_name }}-lint
+      cancel-in-progress: true
+    timeout-minutes: 20
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-go@v5
+        with:
+          go-version: ${{ env.go-version }}
+          cache: true
+          cache-dependency-path: go.sum
+
+      - run: make check
+
+  Test:
+    runs-on: ubuntu-latest
+    concurrency:
+      group: ${{ github.event_name }}-${{ github.workflow }}-${{ github.ref_name }}-test
+      cancel-in-progress: true
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-go@v5
+        with:
+          go-version: ${{ env.go-version }}
+          cache: true
+          cache-dependency-path: go.sum
+
+      - run: make test
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
