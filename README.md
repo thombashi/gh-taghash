@@ -2,6 +2,11 @@
 
 `gh` extension to convert a git commit hash to a git tag name and vice versa on a remote GitHub repository.
 
+[![Go Reference](https://pkg.go.dev/badge/github.com/thombashi/gh-taghash.svg)](https://pkg.go.dev/github.com/thombashi/gh-taghash)
+[![Go Report Card](https://goreportcard.com/badge/github.com/thombashi/gh-taghash)](https://goreportcard.com/report/github.com/thombashi/gh-taghash)
+[![CI](https://github.com/thombashi/gh-taghash/actions/workflows/ci.yaml/badge.svg)](https://github.com/thombashi/gh-taghash/actions/workflows/ci.yaml)
+[![CodeQL](https://github.com/thombashi/gh-taghash/actions/workflows/github-code-scanning/codeql/badge.svg)](https://github.com/thombashi/gh-taghash/actions/workflows/github-code-scanning/codeql)
+
 
 ## Installation
 
