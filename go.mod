@@ -8,8 +8,8 @@ require (
 	github.com/phsym/console-slog v0.3.1
 	github.com/spf13/pflag v1.0.5
 	github.com/stretchr/testify v1.9.0
-	github.com/thombashi/eoe v0.0.2
-	github.com/thombashi/gh-git-describe v0.1.0
+	github.com/thombashi/eoe v0.1.0
+	github.com/thombashi/gh-git-describe v0.1.1
 	gorm.io/driver/sqlite v1.5.7
 	gorm.io/gorm v1.25.12
 )
@@ -29,8 +29,8 @@ require (
 	github.com/pmezard/go-difflib v1.0.0 // indirect
 	github.com/rivo/uniseg v0.4.7 // indirect
 	github.com/thlib/go-timezone-local v0.0.6 // indirect
-	github.com/thombashi/go-gitexec v0.0.3 // indirect
-	golang.org/x/sys v0.28.0 // indirect
+	github.com/thombashi/go-gitexec v0.1.0 // indirect
+	golang.org/x/sys v0.29.0 // indirect
 	golang.org/x/term v0.27.0 // indirect
 	golang.org/x/text v0.21.0 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
