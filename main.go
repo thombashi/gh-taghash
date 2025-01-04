@@ -50,9 +50,10 @@ func main() {
 	eoe.ExitOnError(err, eoeParams.WithMessage("failed to create a GitHub client"))
 
 	gdExecutor, err := gitdescribe.New(&gitdescribe.Params{
-		Logger:       logger,
-		CacheDirPath: flags.CacheDirPath,
-		CacheTTL:     cacheTTL.GitFileTTL,
+		Logger:         logger,
+		LogWithPackage: true,
+		CacheDirPath:   flags.CacheDirPath,
+		CacheTTL:       cacheTTL.GitFileTTL,
 	})
 	eoe.ExitOnError(err, eoeParams.WithMessage("failed to create a git-describe executor"))
 

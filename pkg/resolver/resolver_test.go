@@ -81,8 +81,9 @@ func TestResolver_ResolveTagContext(t *testing.T) {
 	r.NoError(err)
 
 	gdExecutor, err := gitdescribe.New(&gitdescribe.Params{
-		Logger:   testLogger,
-		CacheTTL: cacheTTL.GitFileTTL,
+		Logger:         testLogger,
+		LogWithPackage: true,
+		CacheTTL:       cacheTTL.GitFileTTL,
 	})
 	r.NoError(err)
 
@@ -150,8 +151,9 @@ func TestResolver_ResolveHashContext(t *testing.T) {
 	r.NoError(err)
 
 	gdExecutor, err := gitdescribe.New(&gitdescribe.Params{
-		Logger:   testLogger,
-		CacheTTL: cacheTTL.GitFileTTL,
+		Logger:         testLogger,
+		LogWithPackage: true,
+		CacheTTL:       cacheTTL.GitFileTTL,
 	})
 	r.NoError(err)
 
