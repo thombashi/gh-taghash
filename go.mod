@@ -1,6 +1,6 @@
 module github.com/thombashi/gh-taghash
 
-go 1.21
+go 1.23
 
 require (
 	github.com/cli/go-gh/v2 v2.11.1
