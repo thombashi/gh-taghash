@@ -69,6 +69,9 @@ type Params struct {
 
 	// CacheTTL is the time duration settings for the cache
 	CacheTTL CacheTTL
+
+	// LogWithPackage is a flag to add module information to the log.
+	LogWithPackage bool
 }
 
 // New creates a new resolver
@@ -84,6 +87,9 @@ func New(params *Params) (*Resolver, error) {
 	logger := params.Logger
 	if logger == nil {
 		logger = slog.Default()
+	}
+	if params.LogWithPackage {
+		logger = logger.With(slog.String("package", "gh-taghash/pkg/resolver"))
 	}
 
 	cacheDirPerm := params.CacheDirPerm
