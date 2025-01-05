@@ -381,6 +381,7 @@ func (r Resolver) ResolveTagContext(ctx context.Context, repo repository.Reposit
 
 	r.logger.Debug("resolving a tag", slog.String("repo", repoID), slog.String("from", tag))
 
+	// try to fetch the record from the cache database at first
 	err = r.db.WithContext(ctx).Transaction(func(tx *gorm.DB) error {
 		result := tx.Where(&GitTag{RepoID: repoID, Tag: tag}).Where(whereNotExpired, now).First(&gitTag)
 		return result.Error
@@ -391,6 +392,7 @@ func (r Resolver) ResolveTagContext(ctx context.Context, repo repository.Reposit
 		return nil, fmt.Errorf("failed to select record: %w", err)
 	}
 
+	// update the cache database if the record does not exist
 	if err := r.updateCacheDB(ctx, repo, &now); err != nil {
 		return nil, fmt.Errorf("failed to update the cache database: %w", err)
 	}
@@ -475,6 +477,7 @@ func (r Resolver) ResolveHashContext(ctx context.Context, repo repository.Reposi
 
 	r.logger.Debug("resolving a hash", slog.String("repo", repoID), slog.String("from", hash))
 
+	// try to fetch the record from the cache database at first
 	err = r.db.WithContext(ctx).Transaction(func(tx *gorm.DB) error {
 		result := tx.Where(whereTagHash).Or(whereCommitHash).Where(whereNotExpired, now).Find(&gitTags)
 		if result.Error == nil {
@@ -493,6 +496,7 @@ func (r Resolver) ResolveHashContext(ctx context.Context, repo repository.Reposi
 		return nil, fmt.Errorf("failed to select record from the cache db: %w", err)
 	}
 
+	// update the cache database if the record does not exist
 	if err := r.updateCacheDB(ctx, repo, &now); err != nil {
 		return nil, err
 	}
@@ -515,6 +519,8 @@ func (r Resolver) ResolveHashContext(ctx context.Context, repo repository.Reposi
 	} else if !errors.Is(err, gorm.ErrRecordNotFound) {
 		return nil, fmt.Errorf("failed to select record from the cache db: %w", err)
 	}
+
+	// resolve from the git object if the record does not exist
 
 	tag, err := r.gdExecutor.RunGitDescribeContext(ctx, &gitdescribe.RepoCloneParams{
 		RepoID:   repoID,
