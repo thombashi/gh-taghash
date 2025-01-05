@@ -1,6 +1,7 @@
 package resolver
 
 import (
+	"fmt"
 	"log"
 	"os"
 	"time"
@@ -16,12 +17,17 @@ const (
 
 type GitTag struct {
 	gorm.Model
-	ID        uint
-	RepoID    string
-	Tag       string
-	BaseTag   string
-	Hash      string
-	ExpiredAt time.Time
+	ID         uint
+	RepoID     string
+	Tag        string
+	BaseTag    string
+	CommitHash string
+	TagHash    string
+	ExpiredAt  time.Time
+}
+
+func (g GitTag) String() string {
+	return fmt.Sprintf("RepoID=%s, Tag=%s, CommitHash=%s, TagHash=%s", g.RepoID, g.Tag, g.CommitHash, g.TagHash)
 }
 
 var gormLogger = logger.New(

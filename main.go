@@ -75,23 +75,34 @@ func main() {
 
 	for _, arg := range args {
 		if resolver.IsSHA(arg) {
-			taghashes, err := r.ResolveHashContext(ctx, repo, arg)
+			hash := arg
+			gitTags, err := r.ResolveHashContext(ctx, repo, hash)
 			eoe.ExitOnError(err, eoeParams.WithMessage("failed to resolve a hash"))
 
-			for _, th := range taghashes {
-				logger.Debug("resolved a hash", slog.String("from", th.Hash), slog.String("to", th.Tag))
+			for _, gitTag := range gitTags {
+				logger.Debug("resolved a hash", slog.String("from", hash), slog.String("to", gitTag.Tag))
 				if flags.ShowBaseTag {
-					fmt.Println(th.BaseTag)
+					fmt.Println(gitTag.BaseTag)
 				} else {
-					fmt.Println(th.Tag)
+					fmt.Println(gitTag.Tag)
 				}
 			}
 		} else {
-			taghash, err := r.ResolveTagContext(ctx, repo, arg)
+			gitTag, err := r.ResolveTagContext(ctx, repo, arg)
 			eoe.ExitOnError(err, eoeParams.WithMessage("failed to resolve a tag"))
 
-			logger.Debug("resolved a tag", slog.String("from", arg), slog.String("to", taghash.Hash))
-			fmt.Println(taghash.Hash)
+			logger.Debug("resolved a tag", slog.String("from", arg), slog.String("to", gitTag.String()))
+			PrintHashes(*gitTag)
 		}
 	}
+}
+
+func PrintHashes(gitTag resolver.GitTag) {
+	if gitTag.TagHash == gitTag.CommitHash {
+		fmt.Println(gitTag.CommitHash)
+		return
+	}
+
+	fmt.Println(gitTag.CommitHash)
+	fmt.Println(gitTag.TagHash)
 }

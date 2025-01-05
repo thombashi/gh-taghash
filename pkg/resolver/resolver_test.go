@@ -104,19 +104,21 @@ func TestResolver_ResolveTagContext(t *testing.T) {
 		{
 			value: "v1.1.0",
 			want: &GitTag{
-				RepoID:  ToRepoID(repo),
-				Tag:     "v1.1.0",
-				BaseTag: "v1.1.0",
-				Hash:    "ec3afacf7f605c9fc12c70bc1c9e1708ddb99eca",
+				RepoID:     ToRepoID(repo),
+				Tag:        "v1.1.0",
+				BaseTag:    "v1.1.0",
+				TagHash:    "ec3afacf7f605c9fc12c70bc1c9e1708ddb99eca",
+				CommitHash: "0b496e91ec7ae4428c3ed2eeb4c3a40df431f2cc",
 			},
 		},
 		{
 			value: "v4.1.6-4-g6ccd57f",
 			want: &GitTag{
-				RepoID:  ToRepoID(repo),
-				Tag:     "v4.1.6-4-g6ccd57f",
-				BaseTag: "v4.1.6",
-				Hash:    "6ccd57f4c5d15bdc2fef309bd9fb6cc9db2ef1c6",
+				RepoID:     ToRepoID(repo),
+				Tag:        "v4.1.6-4-g6ccd57f",
+				BaseTag:    "v4.1.6",
+				TagHash:    "6ccd57f4c5d15bdc2fef309bd9fb6cc9db2ef1c6",
+				CommitHash: "6ccd57f4c5d15bdc2fef309bd9fb6cc9db2ef1c6",
 			},
 		},
 	}
@@ -124,7 +126,8 @@ func TestResolver_ResolveTagContext(t *testing.T) {
 		for i := 0; i < 2; i++ {
 			got, err := resolver.ResolveTagContext(context.Background(), repo, tc.value)
 			r.NoError(err)
-			a.Equal(tc.want.Hash, got.Hash, tc.value)
+			a.Equal(tc.want.TagHash, got.TagHash, tc.value)
+			a.Equal(tc.want.CommitHash, got.CommitHash, tc.value)
 			a.Equal(tc.want.RepoID, got.RepoID, repo)
 			a.Equal(tc.want.Tag, got.Tag)
 			a.Equal(tc.want.BaseTag, got.BaseTag)
@@ -176,19 +179,31 @@ func TestResolver_ResolveHashContext(t *testing.T) {
 		{
 			value: "ec3afacf7f605c9fc12c70bc1c9e1708ddb99eca",
 			want: &GitTag{
-				RepoID:  ToRepoID(repo),
-				Tag:     "v1.1.0",
-				BaseTag: "v1.1.0",
-				Hash:    "ec3afacf7f605c9fc12c70bc1c9e1708ddb99eca",
+				RepoID:     ToRepoID(repo),
+				Tag:        "v1.1.0",
+				BaseTag:    "v1.1.0",
+				TagHash:    "ec3afacf7f605c9fc12c70bc1c9e1708ddb99eca",
+				CommitHash: "0b496e91ec7ae4428c3ed2eeb4c3a40df431f2cc",
+			},
+		},
+		{
+			value: "0b496e91ec7ae4428c3ed2eeb4c3a40df431f2cc",
+			want: &GitTag{
+				RepoID:     ToRepoID(repo),
+				Tag:        "v1.1.0",
+				BaseTag:    "v1.1.0",
+				TagHash:    "ec3afacf7f605c9fc12c70bc1c9e1708ddb99eca",
+				CommitHash: "0b496e91ec7ae4428c3ed2eeb4c3a40df431f2cc",
 			},
 		},
 		{
 			value: "6ccd57f4c5d15bdc2fef309bd9fb6cc9db2ef1c6",
 			want: &GitTag{
-				RepoID:  ToRepoID(repo),
-				Tag:     "v4.1.6-4-g6ccd57f",
-				BaseTag: "v4.1.6",
-				Hash:    "6ccd57f4c5d15bdc2fef309bd9fb6cc9db2ef1c6",
+				RepoID:     ToRepoID(repo),
+				Tag:        "v4.1.6-4-g6ccd57f",
+				BaseTag:    "v4.1.6",
+				TagHash:    "6ccd57f4c5d15bdc2fef309bd9fb6cc9db2ef1c6",
+				CommitHash: "6ccd57f4c5d15bdc2fef309bd9fb6cc9db2ef1c6",
 			},
 		},
 	}
@@ -199,7 +214,8 @@ func TestResolver_ResolveHashContext(t *testing.T) {
 			a.Len(gotTags, 1)
 
 			got := gotTags[0]
-			a.Equal(tc.want.Hash, got.Hash, tc.value)
+			a.Equal(tc.want.TagHash, got.TagHash, tc.value)
+			a.Equal(tc.want.CommitHash, got.CommitHash, tc.value)
 			a.Equal(tc.want.RepoID, got.RepoID, repo)
 			a.Equal(tc.want.Tag, got.Tag)
 			a.Equal(tc.want.BaseTag, got.BaseTag)
