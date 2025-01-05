@@ -61,7 +61,7 @@ test:
 	go test -v ./...
 
 run-test: install
-	gh taghash --repo actions/checkout --log-level=debug \
+	gh taghash --repo actions/checkout --log-level=debug --format=json \
 		v1.1.0 \
 		ec3afacf7f605c9fc12c70bc1c9e1708ddb99eca \
 		0b496e91ec7ae4428c3ed2eeb4c3a40df431f2cc \
@@ -74,7 +74,7 @@ run-test: install
 		6ccd57f4c5d15bdc2fef309bd9fb6cc9db2ef1c6
 
 run-no-cache-test: install
-	gh taghash --repo actions/checkout --log-level=debug --no-cache \
+	gh taghash --repo actions/checkout --log-level=debug --format=json --no-cache \
 		v1.1.0 \
 		a5ac7e51b41094c92402da3b24376905380afc29 \
 		6ccd57f4c5d15bdc2fef309bd9fb6cc9db2ef1c6 \
