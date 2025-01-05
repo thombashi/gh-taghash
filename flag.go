@@ -2,6 +2,8 @@ package main
 
 import (
 	"fmt"
+	"slices"
+	"strings"
 
 	"github.com/cli/go-gh/v2/pkg/repository"
 	"github.com/spf13/pflag"
@@ -11,7 +13,9 @@ import (
 type Flags struct {
 	LogLevelStr string
 	RepoID      string
-	ShowBaseTag bool
+
+	OutputFormat string
+	ShowBaseTag  bool
 
 	CacheDirPath string
 	CacheTTLStr  string
@@ -20,6 +24,10 @@ type Flags struct {
 
 func setFlags() (*Flags, []string, error) {
 	var flags Flags
+	validOutputFormats := []string{
+		"text",
+		"json",
+	}
 
 	pflag.StringVarP(
 		&flags.RepoID,
@@ -33,6 +41,13 @@ func setFlags() (*Flags, []string, error) {
 		"log-level",
 		"info",
 		"log level (debug, info, warn, error)",
+	)
+
+	pflag.StringVar(
+		&flags.OutputFormat,
+		"format",
+		"text",
+		fmt.Sprintf("output format (%s)", strings.Join(validOutputFormats, ", ")),
 	)
 	pflag.BoolVar(
 		&flags.ShowBaseTag,
@@ -69,6 +84,11 @@ func setFlags() (*Flags, []string, error) {
 		}
 
 		flags.RepoID = resolver.ToRepoID(repo)
+	}
+
+	flags.OutputFormat = strings.ToLower(strings.TrimSpace(flags.OutputFormat))
+	if !slices.Contains(validOutputFormats, flags.OutputFormat) {
+		return nil, nil, fmt.Errorf("invalid output format (%s), expected one of %s", flags.OutputFormat, strings.Join(validOutputFormats, ", "))
 	}
 
 	args := pflag.Args()

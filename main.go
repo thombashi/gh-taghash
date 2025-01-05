@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"log/slog"
 	"os"
@@ -14,6 +15,10 @@ import (
 	"github.com/thombashi/gh-taghash/pkg/resolver"
 )
 
+const (
+	jsonIndent = "    "
+)
+
 func newLogger(level slog.Level) *slog.Logger {
 	logger := slog.New(
 		console.NewHandler(os.Stderr, &console.HandlerOptions{
@@ -22,6 +27,68 @@ func newLogger(level slog.Level) *slog.Logger {
 	)
 
 	return logger
+}
+
+func printTag(gitTag resolver.GitTag, flags Flags) error {
+	switch flags.OutputFormat {
+	case "text":
+		if flags.ShowBaseTag {
+			fmt.Println(gitTag.BaseTag)
+		} else {
+			fmt.Println(gitTag.Tag)
+		}
+
+	case "json":
+		body := map[string]string{
+			"tag": gitTag.Tag,
+		}
+
+		if flags.ShowBaseTag {
+			body["tag"] = gitTag.BaseTag
+		}
+
+		jsonData, err := json.MarshalIndent(body, "", jsonIndent)
+		if err != nil {
+			return fmt.Errorf("failed to marshal a JSON: %w", err)
+		}
+
+		fmt.Println(string(jsonData))
+	}
+
+	return nil
+}
+
+func printHashes(gitTag resolver.GitTag, flags Flags) error {
+	const (
+		commitHashKey = "commitHash"
+		tagHashKey    = "tagHash"
+	)
+
+	switch flags.OutputFormat {
+	case "text":
+		if gitTag.TagHash == gitTag.CommitHash {
+			fmt.Println(gitTag.CommitHash)
+			return nil
+		}
+
+		fmt.Printf("%s: %s\n", commitHashKey, gitTag.CommitHash)
+		fmt.Printf("%s: %s\n", tagHashKey, gitTag.TagHash)
+
+	case "json":
+		body := map[string]string{
+			commitHashKey: gitTag.CommitHash,
+			tagHashKey:    gitTag.TagHash,
+		}
+
+		jsonData, err := json.MarshalIndent(body, "", jsonIndent)
+		if err != nil {
+			return fmt.Errorf("failed to marshal a JSON: %w", err)
+		}
+
+		fmt.Println(string(jsonData))
+	}
+
+	return nil
 }
 
 func main() {
@@ -81,28 +148,16 @@ func main() {
 
 			for _, gitTag := range gitTags {
 				logger.Debug("resolved a hash", slog.String("from", hash), slog.String("to", gitTag.Tag))
-				if flags.ShowBaseTag {
-					fmt.Println(gitTag.BaseTag)
-				} else {
-					fmt.Println(gitTag.Tag)
-				}
+				err = printTag(gitTag, *flags)
+				eoe.ExitOnError(err, eoeParams.WithMessage("failed to print a tag"))
 			}
 		} else {
 			gitTag, err := r.ResolveTagContext(ctx, repo, arg)
 			eoe.ExitOnError(err, eoeParams.WithMessage("failed to resolve a tag"))
 
 			logger.Debug("resolved a tag", slog.String("from", arg), slog.String("to", gitTag.String()))
-			PrintHashes(*gitTag)
+			err = printHashes(*gitTag, *flags)
+			eoe.ExitOnError(err, eoeParams.WithMessage("failed to print hashes"))
 		}
 	}
-}
-
-func PrintHashes(gitTag resolver.GitTag) {
-	if gitTag.TagHash == gitTag.CommitHash {
-		fmt.Println(gitTag.CommitHash)
-		return
-	}
-
-	fmt.Println(gitTag.CommitHash)
-	fmt.Println(gitTag.TagHash)
 }
