@@ -481,3 +481,19 @@ func (r Resolver) ResolveHashContext(ctx context.Context, repo repository.Reposi
 
 	return []TagHash{*newTagHash}, nil
 }
+
+// Close closes the resolver
+func (r *Resolver) Close() error {
+	sqlDB, err := r.db.DB()
+	if err != nil {
+		return fmt.Errorf("failed to get a database connection: %w", err)
+	}
+
+	if err := sqlDB.Close(); err != nil {
+		return fmt.Errorf("failed to close the database connection: %w", err)
+	}
+
+	r.db = nil
+
+	return nil
+}

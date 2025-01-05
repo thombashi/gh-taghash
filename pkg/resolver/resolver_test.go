@@ -134,6 +134,8 @@ func TestResolver_ResolveTagContext(t *testing.T) {
 	tag := "invalid-tag"
 	_, err = resolver.ResolveTagContext(context.Background(), repo, tag)
 	r.Error(err)
+
+	a.NoError(resolver.Close())
 }
 
 func TestResolver_ResolveHashContext(t *testing.T) {
@@ -207,4 +209,6 @@ func TestResolver_ResolveHashContext(t *testing.T) {
 	sha := "1111111111111111111111111111111111111111"
 	_, err = resolver.ResolveHashContext(context.Background(), repo, sha)
 	r.Error(err)
+
+	a.NoError(resolver.Close())
 }
