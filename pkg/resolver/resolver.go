@@ -33,6 +33,7 @@ func IsSHA(s string) bool {
 	return shaRegexp.MatchString(s)
 }
 
+// ToRepoID returns a repository ID string formatted as "owner/name"
 func ToRepoID(repo repository.Repository) string {
 	return fmt.Sprintf("%s/%s", repo.Owner, repo.Name)
 }
