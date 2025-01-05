@@ -64,6 +64,7 @@ func main() {
 		CacheDirPath:    flags.CacheDirPath,
 		ClearCache:      flags.NoCache,
 		CacheTTL:        *cacheTTL,
+		LogWithPackage:  true,
 	})
 	eoe.ExitOnError(err, eoeParams.WithMessage("failed to create a resolver"))
 
