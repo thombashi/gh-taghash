@@ -29,6 +29,7 @@ gh extension upgrade taghash
 ```
       --cache-dir string   cache directory path. If not specified, use a user cache directory.
       --cache-ttl string   base cache TTL (time-to-live) (default "48h")
+      --format string      output format (text, json) (default "text")
       --log-level string   log level (debug, info, warn, error) (default "info")
       --no-cache           disable cache
   -R, --repo string        GitHub repository ID. If not specified, use the current repository.
@@ -51,4 +52,12 @@ $ gh taghash --repo=actions/checkout v4.1.6-4-g6ccd57f
 6ccd57f4c5d15bdc2fef309bd9fb6cc9db2ef1c6
 $ gh taghash --repo=actions/checkout 6ccd57f4c5d15bdc2fef309bd9fb6cc9db2ef1c6 --show-base-tag
 v4.1.6
+```
+
+```
+$ gh taghash --repo=actions/checkout v1.1.0 --format=json
+{
+    "commitHash": "0b496e91ec7ae4428c3ed2eeb4c3a40df431f2cc",
+    "tagHash": "ec3afacf7f605c9fc12c70bc1c9e1708ddb99eca"
+}
 ```
