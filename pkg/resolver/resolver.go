@@ -113,7 +113,7 @@ func New(params *Params) (*Resolver, error) {
 		return nil, fmt.Errorf("failed to open a database: %w", err)
 	}
 
-	if err := db.AutoMigrate(&TagHash{}); err != nil {
+	if err := db.AutoMigrate(&GitTag{}); err != nil {
 		return nil, fmt.Errorf("failed to migrate the database: %w", err)
 	}
 
@@ -123,7 +123,7 @@ func New(params *Params) (*Resolver, error) {
 		logger.Debug("mark as delete all the cache records", slog.String("path", cacheDBPath))
 		ctx := context.Background()
 		err := db.WithContext(ctx).Transaction(func(tx *gorm.DB) error {
-			result := tx.Model(&TagHash{}).Where("1 = 1").Delete(&TagHash{})
+			result := tx.Model(&GitTag{}).Where("1 = 1").Delete(&GitTag{})
 			if result.Error != nil {
 				return fmt.Errorf("failed to delete records: %w", result.Error)
 			}
@@ -220,7 +220,7 @@ func (r *Resolver) PruneCache(ctx context.Context, threshold *time.Time) error {
 	}
 
 	err := r.db.WithContext(ctx).Transaction(func(tx *gorm.DB) error {
-		result := tx.Model(&TagHash{}).Where(whereExpired, threshold).Delete(&TagHash{})
+		result := tx.Model(&GitTag{}).Where(whereExpired, threshold).Delete(&GitTag{})
 		if result.Error != nil {
 			return fmt.Errorf("failed to delete expired records: %w", result.Error)
 		}
@@ -278,15 +278,15 @@ func (r *Resolver) updateCacheDB(ctx context.Context, repo repository.Repository
 				return fmt.Errorf("failed to get a TTL for the tag: %s", tag)
 			}
 
-			taghash := &TagHash{
+			taghash := &GitTag{
 				RepoID:    repoID,
 				Tag:       tag,
 				BaseTag:   tag,
 				Hash:      hash,
 				ExpiredAt: expiredAt,
 			}
-			if tx.Model(&TagHash{}).Where(&TagHash{RepoID: repoID, Tag: tag, Hash: hash}).Updates(taghash).RowsAffected == 0 {
-				result := tx.Model(&TagHash{}).Create(taghash)
+			if tx.Model(&GitTag{}).Where(&GitTag{RepoID: repoID, Tag: tag, Hash: hash}).Updates(taghash).RowsAffected == 0 {
+				result := tx.Model(&GitTag{}).Create(taghash)
 				if result.Error != nil {
 					return fmt.Errorf("failed to create a record: %w", result.Error)
 				}
@@ -307,25 +307,25 @@ func (r *Resolver) updateCacheDB(ctx context.Context, repo repository.Repository
 }
 
 // ResolveTag resolves a tag to a hash
-func (r Resolver) ResolveTag(repo repository.Repository, tag string) (*TagHash, error) {
+func (r Resolver) ResolveTag(repo repository.Repository, tag string) (*GitTag, error) {
 	return r.ResolveTagContext(context.Background(), repo, tag)
 }
 
 // ResolveTagContext resolves a tag to a hash with the specified context
-func (r Resolver) ResolveTagContext(ctx context.Context, repo repository.Repository, tag string) (*TagHash, error) {
+func (r Resolver) ResolveTagContext(ctx context.Context, repo repository.Repository, tag string) (*GitTag, error) {
 	if tag == "" {
 		return nil, errors.New("require a tag")
 	}
 
 	var err error
-	var taghash TagHash
+	var taghash GitTag
 	repoID := ToRepoID(repo)
 	now := time.Now()
 
 	r.logger.Debug("resolving a tag", slog.String("repo", repoID), slog.String("from", tag))
 
 	err = r.db.WithContext(ctx).Transaction(func(tx *gorm.DB) error {
-		result := tx.Where(&TagHash{RepoID: repoID, Tag: tag}).Where(whereNotExpired, now).First(&taghash)
+		result := tx.Where(&GitTag{RepoID: repoID, Tag: tag}).Where(whereNotExpired, now).First(&taghash)
 		return result.Error
 	}, &sql.TxOptions{ReadOnly: true})
 	if err == nil {
@@ -340,7 +340,7 @@ func (r Resolver) ResolveTagContext(ctx context.Context, repo repository.Reposit
 
 	// retry to fetch the record from the cache database after updating the cache
 	err = r.db.WithContext(ctx).Transaction(func(tx *gorm.DB) error {
-		result := tx.Where(&TagHash{RepoID: repoID, Tag: tag}).Where(whereNotExpired, now).First(&taghash)
+		result := tx.Where(&GitTag{RepoID: repoID, Tag: tag}).Where(whereNotExpired, now).First(&taghash)
 		return result.Error
 	}, &sql.TxOptions{ReadOnly: true})
 	if err == nil {
@@ -365,7 +365,7 @@ func (r Resolver) ResolveTagContext(ctx context.Context, repo repository.Reposit
 		return nil, fmt.Errorf("failed to run git-describe: %w", err)
 	}
 
-	newTagHash := &TagHash{
+	newTagHash := &GitTag{
 		RepoID:    repoID,
 		Tag:       tag,
 		BaseTag:   baseTag,
@@ -373,9 +373,9 @@ func (r Resolver) ResolveTagContext(ctx context.Context, repo repository.Reposit
 		ExpiredAt: now.Add(r.cacheTTL.GitFileTTL),
 	}
 	err = r.db.WithContext(ctx).Transaction(func(tx *gorm.DB) error {
-		if tx.Model(&TagHash{}).Where(&TagHash{RepoID: repoID, Tag: tag, Hash: hash}).Updates(newTagHash).RowsAffected == 0 {
+		if tx.Model(&GitTag{}).Where(&GitTag{RepoID: repoID, Tag: tag, Hash: hash}).Updates(newTagHash).RowsAffected == 0 {
 			r.logger.Debug("creating a new record", slog.String("tag", tag), slog.String("hash", hash))
-			result := tx.Model(&TagHash{}).Create(newTagHash)
+			result := tx.Model(&GitTag{}).Create(newTagHash)
 			if result.Error != nil {
 				return fmt.Errorf("failed to create a record: %w", result.Error)
 			}
@@ -391,25 +391,25 @@ func (r Resolver) ResolveTagContext(ctx context.Context, repo repository.Reposit
 }
 
 // ResolveHash resolves a commit hash to tags
-func (r Resolver) ResolveHash(repo repository.Repository, hash string) ([]TagHash, error) {
+func (r Resolver) ResolveHash(repo repository.Repository, hash string) ([]GitTag, error) {
 	return r.ResolveHashContext(context.Background(), repo, hash)
 }
 
 // ResolveHashContext resolves a commit hash to tags with the specified context
-func (r Resolver) ResolveHashContext(ctx context.Context, repo repository.Repository, hash string) ([]TagHash, error) {
+func (r Resolver) ResolveHashContext(ctx context.Context, repo repository.Repository, hash string) ([]GitTag, error) {
 	if !IsSHA(hash) {
 		return nil, fmt.Errorf("invalid SHA: %s", hash)
 	}
 
 	var err error
-	var taghashes []TagHash
+	var taghashes []GitTag
 	repoID := ToRepoID(repo)
 	now := time.Now()
 
 	r.logger.Debug("resolving a hash", slog.String("repo", repoID), slog.String("from", hash))
 
 	err = r.db.WithContext(ctx).Transaction(func(tx *gorm.DB) error {
-		result := tx.Where(&TagHash{RepoID: repoID, Hash: hash}).Where(whereNotExpired, now).Find(&taghashes)
+		result := tx.Where(&GitTag{RepoID: repoID, Hash: hash}).Where(whereNotExpired, now).Find(&taghashes)
 		if result.Error == nil {
 			if len(taghashes) > 0 {
 				return nil
@@ -432,7 +432,7 @@ func (r Resolver) ResolveHashContext(ctx context.Context, repo repository.Reposi
 
 	// retry to fetch the record from the cache database after updating the cache
 	err = r.db.WithContext(ctx).Transaction(func(tx *gorm.DB) error {
-		result := tx.Where(&TagHash{RepoID: repoID, Hash: hash}).Where(whereNotExpired, now).Find(&taghashes)
+		result := tx.Where(&GitTag{RepoID: repoID, Hash: hash}).Where(whereNotExpired, now).Find(&taghashes)
 		if result.Error == nil {
 			if len(taghashes) > 0 {
 				return nil
@@ -465,7 +465,7 @@ func (r Resolver) ResolveHashContext(ctx context.Context, repo repository.Reposi
 		return nil, fmt.Errorf("failed to run git-describe: %w", err)
 	}
 
-	newTagHash := &TagHash{
+	newTagHash := &GitTag{
 		RepoID:    repoID,
 		Tag:       tag,
 		BaseTag:   baseTag,
@@ -473,8 +473,8 @@ func (r Resolver) ResolveHashContext(ctx context.Context, repo repository.Reposi
 		ExpiredAt: now.Add(r.cacheTTL.GitFileTTL),
 	}
 	err = r.db.WithContext(ctx).Transaction(func(tx *gorm.DB) error {
-		if tx.Model(&TagHash{}).Where(&TagHash{RepoID: repoID, Tag: tag, Hash: hash}).Updates(newTagHash).RowsAffected == 0 {
-			result := tx.Model(&TagHash{}).Create(newTagHash)
+		if tx.Model(&GitTag{}).Where(&GitTag{RepoID: repoID, Tag: tag, Hash: hash}).Updates(newTagHash).RowsAffected == 0 {
+			result := tx.Model(&GitTag{}).Create(newTagHash)
 			if result.Error != nil {
 				return fmt.Errorf("failed to create a record: %w", result.Error)
 			}
@@ -486,7 +486,7 @@ func (r Resolver) ResolveHashContext(ctx context.Context, repo repository.Reposi
 		return nil, fmt.Errorf("failed to update the database: %w", err)
 	}
 
-	return []TagHash{*newTagHash}, nil
+	return []GitTag{*newTagHash}, nil
 }
 
 // Close closes the resolver

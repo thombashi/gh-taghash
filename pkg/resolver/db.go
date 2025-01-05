@@ -14,7 +14,7 @@ const (
 	whereNotExpired = "? <= expired_at"
 )
 
-type TagHash struct {
+type GitTag struct {
 	gorm.Model
 	ID        uint
 	RepoID    string

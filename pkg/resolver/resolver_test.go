@@ -99,11 +99,11 @@ func TestResolver_ResolveTagContext(t *testing.T) {
 
 	testCases := []struct {
 		value string
-		want  *TagHash
+		want  *GitTag
 	}{
 		{
 			value: "v1.1.0",
-			want: &TagHash{
+			want: &GitTag{
 				RepoID:  ToRepoID(repo),
 				Tag:     "v1.1.0",
 				BaseTag: "v1.1.0",
@@ -112,7 +112,7 @@ func TestResolver_ResolveTagContext(t *testing.T) {
 		},
 		{
 			value: "v4.1.6-4-g6ccd57f",
-			want: &TagHash{
+			want: &GitTag{
 				RepoID:  ToRepoID(repo),
 				Tag:     "v4.1.6-4-g6ccd57f",
 				BaseTag: "v4.1.6",
@@ -171,11 +171,11 @@ func TestResolver_ResolveHashContext(t *testing.T) {
 
 	testCases := []struct {
 		value string
-		want  *TagHash
+		want  *GitTag
 	}{
 		{
 			value: "ec3afacf7f605c9fc12c70bc1c9e1708ddb99eca",
-			want: &TagHash{
+			want: &GitTag{
 				RepoID:  ToRepoID(repo),
 				Tag:     "v1.1.0",
 				BaseTag: "v1.1.0",
@@ -184,7 +184,7 @@ func TestResolver_ResolveHashContext(t *testing.T) {
 		},
 		{
 			value: "6ccd57f4c5d15bdc2fef309bd9fb6cc9db2ef1c6",
-			want: &TagHash{
+			want: &GitTag{
 				RepoID:  ToRepoID(repo),
 				Tag:     "v4.1.6-4-g6ccd57f",
 				BaseTag: "v4.1.6",
