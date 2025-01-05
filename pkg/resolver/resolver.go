@@ -15,8 +15,8 @@ import (
 	"github.com/cli/go-gh/v2/pkg/api"
 	"github.com/cli/go-gh/v2/pkg/repository"
 	graphql "github.com/cli/shurcooL-graphql"
+	"github.com/glebarez/sqlite"
 	gitdescribe "github.com/thombashi/gh-git-describe/pkg/executor"
-	"gorm.io/driver/sqlite"
 	"gorm.io/gorm"
 )
 
