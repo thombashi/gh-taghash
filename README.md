@@ -38,12 +38,16 @@ gh extension upgrade taghash
 
 ### Examples
 
+Converting a git tag to a commit hash:
+
 ```
 $ gh taghash --repo=actions/checkout v4.1.6
 a5ac7e51b41094c92402da3b24376905380afc29
 $ gh taghash --repo=actions/checkout a5ac7e51b41094c92402da3b24376905380afc29
 v4.1.6
 ```
+
+Converting a commit hash to a git tag:
 
 ```
 $ gh taghash --repo=actions/checkout 6ccd57f4c5d15bdc2fef309bd9fb6cc9db2ef1c6
@@ -53,6 +57,8 @@ $ gh taghash --repo=actions/checkout v4.1.6-4-g6ccd57f
 $ gh taghash --repo=actions/checkout 6ccd57f4c5d15bdc2fef309bd9fb6cc9db2ef1c6 --show-base-tag
 v4.1.6
 ```
+
+Converting a git tag to hashes in JSON format:
 
 ```
 $ gh taghash --repo=actions/checkout v1.1.0 --format=json
