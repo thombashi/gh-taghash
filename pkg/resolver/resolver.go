@@ -38,6 +38,17 @@ func ToRepoID(repo repository.Repository) string {
 	return fmt.Sprintf("%s/%s", repo.Owner, repo.Name)
 }
 
+func extractShaFromCommitResourcePath(commitResourcePath string) (string, error) {
+	a := strings.Split(commitResourcePath, "/")
+	sha := a[len(a)-1]
+
+	if !IsSHA(sha) {
+		return "", fmt.Errorf("invalid SHA: %s", sha)
+	}
+
+	return sha, nil
+}
+
 type Hash struct {
 	CommitHash string
 	TagHash    string
@@ -186,16 +197,19 @@ func (r Resolver) FetchTagAndOID(repo repository.Repository) (map[string]Hash, e
 
 	r.logger.Debug("fetching tags and oids", slog.String("repo", repoID))
 
-	const commitResourcePathPrefix = "/actions/checkout/commit/"
-
 	err := r.gqlClient.Query("tag_hash", &query, variables)
 	if err != nil {
 		return nil, fmt.Errorf("error fetching tag and oid: %w", err)
 	}
 	for _, node := range query.Repository.Refs.Nodes {
+		sha, err := extractShaFromCommitResourcePath(node.Target.CommitResourcePath)
+		if err != nil {
+			return nil, err
+		}
+
 		tagHash[node.Name] = Hash{
 			TagHash:    node.Target.Oid,
-			CommitHash: strings.TrimPrefix(node.Target.CommitResourcePath, commitResourcePathPrefix),
+			CommitHash: sha,
 		}
 	}
 
@@ -212,9 +226,14 @@ func (r Resolver) FetchTagAndOID(repo repository.Repository) (map[string]Hash, e
 			return nil, fmt.Errorf("error fetching tag and oid: error=%w, cursor=%s", err, endCursor)
 		}
 		for _, node := range query.Repository.Refs.Nodes {
+			sha, err := extractShaFromCommitResourcePath(node.Target.CommitResourcePath)
+			if err != nil {
+				return nil, err
+			}
+
 			tagHash[node.Name] = Hash{
 				TagHash:    node.Target.Oid,
-				CommitHash: strings.TrimPrefix(node.Target.CommitResourcePath, commitResourcePathPrefix),
+				CommitHash: sha,
 			}
 		}
 	}

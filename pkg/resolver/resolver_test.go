@@ -71,10 +71,6 @@ func TestResolver_ResolveTagContext(t *testing.T) {
 	r := require.New(t)
 
 	cacheTTL := NewCacheTTL(60 * time.Second)
-	repo := repository.Repository{
-		Owner: "actions",
-		Name:  "checkout",
-	}
 	gqlClient, err := api.NewGraphQLClient(api.ClientOptions{
 		CacheTTL: cacheTTL.QueryTTL,
 	})
@@ -97,14 +93,24 @@ func TestResolver_ResolveTagContext(t *testing.T) {
 	})
 	r.NoError(err)
 
+	actionsCheckoutRepo := repository.Repository{
+		Owner: "actions",
+		Name:  "checkout",
+	}
+	cliCliRepo := repository.Repository{
+		Owner: "cli",
+		Name:  "cli",
+	}
 	testCases := []struct {
+		repo  repository.Repository
 		value string
 		want  *GitTag
 	}{
 		{
+			repo:  actionsCheckoutRepo,
 			value: "v1.1.0",
 			want: &GitTag{
-				RepoID:     ToRepoID(repo),
+				RepoID:     ToRepoID(actionsCheckoutRepo),
 				Tag:        "v1.1.0",
 				BaseTag:    "v1.1.0",
 				TagHash:    "ec3afacf7f605c9fc12c70bc1c9e1708ddb99eca",
@@ -112,30 +118,42 @@ func TestResolver_ResolveTagContext(t *testing.T) {
 			},
 		},
 		{
+			repo:  actionsCheckoutRepo,
 			value: "v4.1.6-4-g6ccd57f",
 			want: &GitTag{
-				RepoID:     ToRepoID(repo),
+				RepoID:     ToRepoID(actionsCheckoutRepo),
 				Tag:        "v4.1.6-4-g6ccd57f",
 				BaseTag:    "v4.1.6",
 				TagHash:    "6ccd57f4c5d15bdc2fef309bd9fb6cc9db2ef1c6",
 				CommitHash: "6ccd57f4c5d15bdc2fef309bd9fb6cc9db2ef1c6",
 			},
 		},
+		{
+			repo:  cliCliRepo,
+			value: "v2.8.0",
+			want: &GitTag{
+				RepoID:     ToRepoID(cliCliRepo),
+				Tag:        "v2.8.0",
+				BaseTag:    "v2.8.0",
+				TagHash:    "eb08a9bd29ef9e8b07815a38a168069caf66f240",
+				CommitHash: "eb08a9bd29ef9e8b07815a38a168069caf66f240",
+			},
+		},
 	}
 	for _, tc := range testCases {
 		for i := 0; i < 2; i++ {
-			got, err := resolver.ResolveTagContext(context.Background(), repo, tc.value)
+			got, err := resolver.ResolveTagContext(context.Background(), tc.repo, tc.value)
 			r.NoError(err)
 			a.Equal(tc.want.TagHash, got.TagHash, tc.value)
 			a.Equal(tc.want.CommitHash, got.CommitHash, tc.value)
-			a.Equal(tc.want.RepoID, got.RepoID, repo)
+			a.Equal(tc.want.RepoID, got.RepoID, tc.repo)
 			a.Equal(tc.want.Tag, got.Tag)
 			a.Equal(tc.want.BaseTag, got.BaseTag)
 		}
 	}
 
 	tag := "invalid-tag"
-	_, err = resolver.ResolveTagContext(context.Background(), repo, tag)
+	_, err = resolver.ResolveTagContext(context.Background(), actionsCheckoutRepo, tag)
 	r.Error(err)
 
 	a.NoError(resolver.Close())
