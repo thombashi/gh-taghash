@@ -25,6 +25,7 @@ type Flags struct {
 func setFlags() (*Flags, []string, error) {
 	var flags Flags
 	validOutputFormats := []string{
+		"simple",
 		"text",
 		"json",
 	}
@@ -46,7 +47,7 @@ func setFlags() (*Flags, []string, error) {
 	pflag.StringVar(
 		&flags.OutputFormat,
 		"format",
-		"text",
+		"simple",
 		fmt.Sprintf("output format (%s)", strings.Join(validOutputFormats, ", ")),
 	)
 	pflag.BoolVar(

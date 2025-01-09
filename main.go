@@ -31,7 +31,7 @@ func newLogger(level slog.Level) *slog.Logger {
 
 func printTag(gitTag resolver.GitTag, flags Flags) error {
 	switch flags.OutputFormat {
-	case "text":
+	case "simple", "text":
 		if flags.ShowBaseTag {
 			fmt.Println(gitTag.BaseTag)
 		} else {
@@ -68,6 +68,15 @@ func printHashes(gitTag resolver.GitTag, flags Flags) error {
 	)
 
 	switch flags.OutputFormat {
+	case "simple":
+		if gitTag.TagHash == gitTag.CommitHash {
+			fmt.Println(gitTag.TagHash)
+			return nil
+		}
+
+		fmt.Println(gitTag.TagHash)
+		fmt.Println(gitTag.CommitHash)
+
 	case "text":
 		if gitTag.TagHash == gitTag.CommitHash {
 			fmt.Println(gitTag.CommitHash)
