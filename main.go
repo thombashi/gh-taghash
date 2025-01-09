@@ -53,6 +53,9 @@ func printTag(gitTag resolver.GitTag, flags Flags) error {
 		}
 
 		fmt.Println(string(jsonData))
+
+	default:
+		return fmt.Errorf("unsupported output format: %s", flags.OutputFormat)
 	}
 
 	return nil
@@ -86,6 +89,9 @@ func printHashes(gitTag resolver.GitTag, flags Flags) error {
 		}
 
 		fmt.Println(string(jsonData))
+
+	default:
+		return fmt.Errorf("unsupported output format: %s", flags.OutputFormat)
 	}
 
 	return nil
