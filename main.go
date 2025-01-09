@@ -74,13 +74,13 @@ func printHashes(gitTag resolver.GitTag, flags Flags) error {
 			return nil
 		}
 
-		fmt.Printf("%s: %s\n", commitHashKey, gitTag.CommitHash)
 		fmt.Printf("%s: %s\n", tagHashKey, gitTag.TagHash)
+		fmt.Printf("%s: %s\n", commitHashKey, gitTag.CommitHash)
 
 	case "json":
 		body := map[string]string{
-			commitHashKey: gitTag.CommitHash,
 			tagHashKey:    gitTag.TagHash,
+			commitHashKey: gitTag.CommitHash,
 		}
 
 		jsonData, err := json.MarshalIndent(body, "", jsonIndent)
