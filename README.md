@@ -27,13 +27,14 @@ gh extension upgrade taghash
 ### Command help
 
 ```
-      --cache-dir string   cache directory path. If not specified, use a user cache directory.
-      --cache-ttl string   base cache TTL (time-to-live) (default "48h")
-      --format string      output format (text, json) (default "text")
-      --log-level string   log level (debug, info, warn, error) (default "info")
-      --no-cache           disable cache
-  -R, --repo string        GitHub repository ID. If not specified, use the current repository.
-      --show-base-tag      show the base tag when resolving a tag from a commit hash
+      --cache-dir string       cache directory path. If not specified, use a user cache directory.
+      --cache-ttl string       base cache TTL (time-to-live) (default "48h")
+      --format string          output format (simple, text, json) (default "simple")
+      --log-level string       log level (debug, info, warn, error) (default "info")
+      --no-cache               disable cache
+  -R, --repo string            GitHub repository ID. If not specified, use the current repository.
+      --show-base-tag          show the base tag when resolving a tag from a commit hash
+      --sql-log-level string   SQL log level (silent, error, warn, info) (default "warn")
 ```
 
 ### Examples
