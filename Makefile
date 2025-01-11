@@ -1,4 +1,4 @@
-VERSION := v0.1.1
+VERSION := v0.2.0
 
 EXTENSION_NAME := gh-taghash
 EXTENSION := thombashi/$(EXTENSION_NAME)
