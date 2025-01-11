@@ -58,6 +58,14 @@ $ gh taghash --repo=actions/checkout 6ccd57f4c5d15bdc2fef309bd9fb6cc9db2ef1c6 --
 v4.1.6
 ```
 
+If a git tag contains both tag hash and commit hash information, both will be output:
+
+```
+gh taghash --repo=actions/checkout v1.1.0 --format=text
+tagHash: ec3afacf7f605c9fc12c70bc1c9e1708ddb99eca
+commitHash: 0b496e91ec7ae4428c3ed2eeb4c3a40df431f2cc
+```
+
 Converting a git tag to hashes in JSON format:
 
 ```
