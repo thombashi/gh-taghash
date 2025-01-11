@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"log/slog"
 	"os"
+	"strings"
 
 	"github.com/cli/go-gh/v2/pkg/api"
 	"github.com/cli/go-gh/v2/pkg/repository"
@@ -13,6 +14,7 @@ import (
 	"github.com/thombashi/eoe"
 	gitdescribe "github.com/thombashi/gh-git-describe/pkg/executor"
 	"github.com/thombashi/gh-taghash/pkg/resolver"
+	gormlogger "gorm.io/gorm/logger"
 )
 
 const (
@@ -27,6 +29,27 @@ func newLogger(level slog.Level) *slog.Logger {
 	)
 
 	return logger
+}
+
+func toGormLogLevel(logLevel string) (gormlogger.LogLevel, error) {
+	logLevel = strings.ToLower(strings.TrimSpace(logLevel))
+
+	switch logLevel {
+	case "silent":
+		return gormlogger.Silent, nil
+
+	case "info":
+		return gormlogger.Info, nil
+
+	case "warn":
+		return gormlogger.Warn, nil
+
+	case "error":
+		return gormlogger.Error, nil
+
+	default:
+		return gormlogger.Error, fmt.Errorf("unsupported log level: %s", logLevel)
+	}
 }
 
 func printTag(gitTag resolver.GitTag, flags Flags) error {
@@ -139,10 +162,14 @@ func main() {
 	})
 	eoe.ExitOnError(err, eoeParams.WithMessage("failed to create a git-describe executor"))
 
+	gormLogLevel, err := toGormLogLevel(flags.SqlLogLevelStr)
+	eoe.ExitOnError(err, eoeParams.WithMessage("failed to get a GORM log level"))
+
 	r, err := resolver.New(&resolver.Params{
 		Client:          gqlClient,
 		GitDescExecutor: gdExecutor,
 		Logger:          logger,
+		GormLogger:      resolver.NewGormLogger(gormLogLevel),
 		CacheDirPath:    flags.CacheDirPath,
 		ClearCache:      flags.NoCache,
 		CacheTTL:        *cacheTTL,

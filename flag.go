@@ -11,8 +11,10 @@ import (
 )
 
 type Flags struct {
-	LogLevelStr string
-	RepoID      string
+	RepoID string
+
+	LogLevelStr    string
+	SqlLogLevelStr string
 
 	OutputFormat string
 	ShowBaseTag  bool
@@ -42,6 +44,12 @@ func setFlags() (*Flags, []string, error) {
 		"log-level",
 		"info",
 		"log level (debug, info, warn, error)",
+	)
+	pflag.StringVar(
+		&flags.SqlLogLevelStr,
+		"sql-log-level",
+		"warn",
+		"SQL log level (silent, error, warn, info)",
 	)
 
 	pflag.StringVar(
@@ -86,6 +94,8 @@ func setFlags() (*Flags, []string, error) {
 
 		flags.RepoID = resolver.ToRepoID(repo)
 	}
+
+	flags.SqlLogLevelStr = strings.ToLower(strings.TrimSpace(flags.SqlLogLevelStr))
 
 	flags.OutputFormat = strings.ToLower(strings.TrimSpace(flags.OutputFormat))
 	if !slices.Contains(validOutputFormats, flags.OutputFormat) {

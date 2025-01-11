@@ -2,12 +2,9 @@ package resolver
 
 import (
 	"fmt"
-	"log"
-	"os"
 	"time"
 
 	"gorm.io/gorm"
-	"gorm.io/gorm/logger"
 )
 
 const (
@@ -42,10 +39,3 @@ type GitTag struct {
 func (g GitTag) String() string {
 	return fmt.Sprintf("RepoID=%s, Tag=%s, CommitHash=%s, TagHash=%s", g.RepoID, g.Tag, g.CommitHash, g.TagHash)
 }
-
-var gormLogger = logger.New(
-	log.New(os.Stdout, "\n", log.LstdFlags), // io writer
-	logger.Config{
-		IgnoreRecordNotFoundError: true, // Ignore ErrRecordNotFound error for logger
-	},
-)

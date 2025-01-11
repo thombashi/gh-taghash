@@ -5,6 +5,7 @@ import (
 	"database/sql"
 	"errors"
 	"fmt"
+	"log"
 	"log/slog"
 	"os"
 	"path/filepath"
@@ -18,6 +19,7 @@ import (
 	"github.com/glebarez/sqlite"
 	gitdescribe "github.com/thombashi/gh-git-describe/pkg/executor"
 	"gorm.io/gorm"
+	gormlogger "gorm.io/gorm/logger"
 )
 
 const (
@@ -36,6 +38,17 @@ func IsSHA(s string) bool {
 // ToRepoID returns a repository ID string formatted as "owner/name"
 func ToRepoID(repo repository.Repository) string {
 	return fmt.Sprintf("%s/%s", repo.Owner, repo.Name)
+}
+
+// NewGormLogger creates a new GORM logger
+func NewGormLogger(logLevel gormlogger.LogLevel) gormlogger.Interface {
+	return gormlogger.New(
+		log.New(os.Stdout, "\n", log.LstdFlags),
+		gormlogger.Config{
+			SlowThreshold:             time.Second,
+			LogLevel:                  logLevel,
+			IgnoreRecordNotFoundError: true,
+		})
 }
 
 func extractShaFromCommitResourcePath(commitResourcePath string) (string, error) {
@@ -71,6 +84,9 @@ type Params struct {
 
 	// Logger is a Logger used by the resolver
 	Logger *slog.Logger
+
+	// GormLogger is a logger for the GORM
+	GormLogger gormlogger.Interface
 
 	// CacheDirPath is the path to the cache directory.
 	// If not specified, it uses the user cache directory.
@@ -121,6 +137,13 @@ func New(params *Params) (*Resolver, error) {
 
 	cacheDBPath := filepath.Join(cacheDirPath, "cache.sqlite3")
 	logger.Debug("cache database info", slog.String("path", cacheDBPath), slog.String("ttl", params.CacheTTL.String()))
+
+	var gormLogger gormlogger.Interface
+	if params.GormLogger != nil {
+		gormLogger = params.GormLogger
+	} else {
+		gormLogger = NewGormLogger(gormlogger.Warn)
+	}
 
 	db, err := gorm.Open(sqlite.Open(cacheDBPath), &gorm.Config{
 		Logger: gormLogger,
