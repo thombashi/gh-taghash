@@ -122,7 +122,7 @@ func New(params *Params) (*Resolver, error) {
 		logger = slog.Default()
 	}
 	if params.LogWithPackage {
-		logger = logger.With(slog.String("package", "gh-taghash/pkg/resolver"))
+		logger = logger.With(slog.String("package", fmt.Sprintf("%s/pkg/resolver", extensionName)))
 	}
 
 	cacheDirPerm := params.CacheDirPerm
