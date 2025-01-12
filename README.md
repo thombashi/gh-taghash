@@ -67,7 +67,7 @@ tagHash: ec3afacf7f605c9fc12c70bc1c9e1708ddb99eca
 commitHash: 0b496e91ec7ae4428c3ed2eeb4c3a40df431f2cc
 ```
 
-Converting a git tag to hashes in JSON format:
+Output the results in JSON format with the `--format=json` flag:
 
 ```
 $ gh taghash --repo=actions/checkout v1.1.0 --format=json
