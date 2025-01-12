@@ -8,6 +8,11 @@ BIN_DIR := $(CURDIR)/bin
 TEST_FORMAT := json
 
 
+GOIMPORTS := $(BIN_DIR)/goimports
+$(GOIMPORTS):
+	mkdir -p $(BIN_DIR)
+	GOBIN=$(BIN_DIR) go install golang.org/x/tools/cmd/goimports@latest
+
 STATICCHECK := $(BIN_DIR)/staticcheck
 $(STATICCHECK):
 	mkdir -p $(BIN_DIR)
@@ -33,7 +38,8 @@ check: $(STATICCHECK) $(TESTIFYILINT)
 	$(TESTIFYILINT) ./...
 
 .PHONEY: fmt
-fmt: $(TESTIFYILINT)
+fmt: $(GOIMPORTS) $(TESTIFYILINT)
+	$(GOIMPORTS) -w .
 	gofmt -w -s .
 	$(TESTIFYILINT) -fix ./...
 
