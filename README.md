@@ -2,6 +2,7 @@
 
 `gh` extension to convert a git tag to hashes and vice versa on a remote GitHub repository.
 
+[![Release](https://img.shields.io/github/release/thombashi/gh-taghash.svg?style=flat-square)](https://github.com/thombashi/gh-taghash/releases/latest)
 [![Go Reference](https://pkg.go.dev/badge/github.com/thombashi/gh-taghash.svg)](https://pkg.go.dev/github.com/thombashi/gh-taghash)
 [![Go Report Card](https://goreportcard.com/badge/github.com/thombashi/gh-taghash)](https://goreportcard.com/report/github.com/thombashi/gh-taghash)
 [![CI](https://github.com/thombashi/gh-taghash/actions/workflows/ci.yaml/badge.svg)](https://github.com/thombashi/gh-taghash/actions/workflows/ci.yaml)
