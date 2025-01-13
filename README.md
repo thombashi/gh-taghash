@@ -1,6 +1,6 @@
 # gh-taghash
 
-`gh` extension to convert a git tag to hashes and vice versa on a remote GitHub repository.
+[gh][] extension to convert a git tag to hashes and vice versa on a remote GitHub repository.
 
 [![Release](https://img.shields.io/github/release/thombashi/gh-taghash.svg?style=flat-square)](https://github.com/thombashi/gh-taghash/releases/latest)
 [![Go Reference](https://pkg.go.dev/badge/github.com/thombashi/gh-taghash.svg)](https://pkg.go.dev/github.com/thombashi/gh-taghash)
@@ -77,3 +77,6 @@ $ gh taghash --repo=actions/checkout v1.1.0 --format=json
     "tagHash": "ec3afacf7f605c9fc12c70bc1c9e1708ddb99eca"
 }
 ```
+
+
+[gh]: https://docs.github.com/en/github-cli/github-cli/about-github-cli
