@@ -25,7 +25,8 @@ $(TESTIFYILINT):
 
 .PHONY: build
 build:
-	go build -o $(EXTENSION_NAME) .
+	mkdir -p $(BIN_DIR)
+	go build -o $(BIN_DIR)/$(EXTENSION_NAME) .
 
 .PHONY: clean
 clean:
@@ -45,7 +46,7 @@ fmt: $(GOIMPORTS) $(TESTIFYILINT)
 
 .PHONY: help
 help: build
-	./$(EXTENSION_NAME) --help
+	$(BIN_DIR)/$(EXTENSION_NAME) --help
 
 .PHONY: uninstall
 uninstall:
