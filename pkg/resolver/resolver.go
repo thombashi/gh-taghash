@@ -380,7 +380,7 @@ func (r Resolver) resolveTagHashFromGitObj(ctx context.Context, repoID, tag stri
 		CacheTTL: r.cacheTTL.GitFileTTL,
 	}, tag)
 	if err != nil {
-		return "", fmt.Errorf("failed to run git-describe: %w", err)
+		return "", err
 	}
 
 	return tagHash, nil
@@ -392,7 +392,7 @@ func (r Resolver) resolveCommitHashFromGitObj(ctx context.Context, repoID, tag s
 		CacheTTL: r.cacheTTL.GitFileTTL,
 	}, "-n", "1", tag)
 	if err != nil {
-		return "", fmt.Errorf("failed to run git-describe: %w", err)
+		return "", err
 	}
 
 	return commitHash, nil
@@ -404,7 +404,7 @@ func (r Resolver) resolveBaseTagFromGitObj(ctx context.Context, repoID, hash str
 		CacheTTL: r.cacheTTL.GitFileTTL,
 	}, "--tags", "--abbrev=0", hash)
 	if err != nil {
-		return "", fmt.Errorf("failed to run git-describe: %w", err)
+		return "", err
 	}
 
 	return baseTag, nil
@@ -569,7 +569,7 @@ func (r Resolver) ResolveHashContext(ctx context.Context, repo repository.Reposi
 		CacheTTL: r.cacheTTL.GitFileTTL,
 	}, "--tags", hash)
 	if err != nil {
-		return nil, fmt.Errorf("failed to run git-describe: %w", err)
+		return nil, err
 	}
 
 	baseTag, err := r.resolveBaseTagFromGitObj(ctx, repoID, hash)
