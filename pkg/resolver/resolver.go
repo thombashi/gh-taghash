@@ -369,9 +369,9 @@ func (r *Resolver) updateCacheDB(ctx context.Context, repo repository.Repository
 	return nil
 }
 
-// ResolveTag resolves a tag to a hash
-func (r Resolver) ResolveTag(repo repository.Repository, tag string) (*GitTag, error) {
-	return r.ResolveTagContext(context.Background(), repo, tag)
+// ResolveFromTag resolves a tag to a hash
+func (r Resolver) ResolveFromTag(repo repository.Repository, tag string) (*GitTag, error) {
+	return r.ResolveFromTagContext(context.Background(), repo, tag)
 }
 
 func (r Resolver) resolveTagHashFromGitObj(ctx context.Context, repoID, tag string) (string, error) {
@@ -410,8 +410,8 @@ func (r Resolver) resolveBaseTagFromGitObj(ctx context.Context, repoID, hash str
 	return baseTag, nil
 }
 
-// ResolveTagContext resolves a tag to a hash with the specified context
-func (r Resolver) ResolveTagContext(ctx context.Context, repo repository.Repository, tag string) (*GitTag, error) {
+// ResolveFromTagContext resolves a tag to a hash with the specified context
+func (r Resolver) ResolveFromTagContext(ctx context.Context, repo repository.Repository, tag string) (*GitTag, error) {
 	if tag == "" {
 		return nil, errors.New("require a tag")
 	}

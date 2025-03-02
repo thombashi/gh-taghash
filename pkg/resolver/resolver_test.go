@@ -66,7 +66,7 @@ func TestIsSHA(t *testing.T) {
 	}
 }
 
-func TestResolver_ResolveTagContext(t *testing.T) {
+func TestResolver_ResolveFromTagContext(t *testing.T) {
 	a := assert.New(t)
 	r := require.New(t)
 
@@ -142,7 +142,7 @@ func TestResolver_ResolveTagContext(t *testing.T) {
 	}
 	for _, tc := range testCases {
 		for i := 0; i < 2; i++ {
-			got, err := resolver.ResolveTagContext(context.Background(), tc.repo, tc.value)
+			got, err := resolver.ResolveFromTagContext(context.Background(), tc.repo, tc.value)
 			r.NoError(err)
 			a.Equal(tc.want.TagHash, got.TagHash, tc.value)
 			a.Equal(tc.want.CommitHash, got.CommitHash, tc.value)
@@ -153,7 +153,7 @@ func TestResolver_ResolveTagContext(t *testing.T) {
 	}
 
 	tag := "invalid-tag"
-	_, err = resolver.ResolveTagContext(context.Background(), actionsCheckoutRepo, tag)
+	_, err = resolver.ResolveFromTagContext(context.Background(), actionsCheckoutRepo, tag)
 	r.Error(err)
 
 	a.NoError(resolver.Close())

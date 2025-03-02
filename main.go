@@ -194,7 +194,7 @@ func main() {
 				eoe.ExitOnError(err, eoeParams.WithMessage("failed to print a tag"))
 			}
 		} else {
-			gitTag, err := r.ResolveTagContext(ctx, repo, arg)
+			gitTag, err := r.ResolveFromTagContext(ctx, repo, arg)
 			eoe.ExitOnError(err, eoeParams.WithMessage("failed to resolve a tag"))
 
 			logger.Debug("resolved a tag", slog.String("from", arg), slog.String("to", gitTag.String()))
