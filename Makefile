@@ -5,6 +5,9 @@ EXTENSION := thombashi/$(EXTENSION_NAME)
 
 BIN_DIR := $(CURDIR)/bin
 
+# build binary must be located in the root of the project to test it with the local gh
+BUILD_BIN := $(EXTENSION_NAME)
+
 TEST_FORMAT := json
 
 
@@ -25,12 +28,11 @@ $(TESTIFYILINT):
 
 .PHONY: build
 build:
-	mkdir -p $(BIN_DIR)
-	go build -o $(BIN_DIR)/$(EXTENSION_NAME) .
+	go build -o $(BUILD_BIN) .
 
 .PHONY: clean
 clean:
-	rm -rf $(BIN_DIR)
+	rm -rf $(BIN_DIR) $(BUILD_BIN)
 
 .PHONY: check
 check: $(STATICCHECK) $(TESTIFYILINT)
@@ -46,7 +48,7 @@ fmt: $(GOIMPORTS) $(TESTIFYILINT)
 
 .PHONY: help
 help: build
-	$(BIN_DIR)/$(EXTENSION_NAME) --help
+	$(BUILD_BIN) --help
 
 .PHONY: uninstall
 uninstall:
