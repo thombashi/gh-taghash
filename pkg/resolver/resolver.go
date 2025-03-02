@@ -499,13 +499,13 @@ func (r Resolver) ResolveFromTagContext(ctx context.Context, repo repository.Rep
 	return newGitTag, nil
 }
 
-// ResolveHash resolves a commit hash to tags
-func (r Resolver) ResolveHash(repo repository.Repository, hash string) ([]GitTag, error) {
-	return r.ResolveHashContext(context.Background(), repo, hash)
+// ResolveFromHash resolves a commit hash to tags
+func (r Resolver) ResolveFromHash(repo repository.Repository, hash string) ([]GitTag, error) {
+	return r.ResolveFromHashContext(context.Background(), repo, hash)
 }
 
-// ResolveHashContext resolves a commit hash to tags with the specified context
-func (r Resolver) ResolveHashContext(ctx context.Context, repo repository.Repository, hash string) ([]GitTag, error) {
+// ResolveFromHashContext resolves a commit hash to tags with the specified context
+func (r Resolver) ResolveFromHashContext(ctx context.Context, repo repository.Repository, hash string) ([]GitTag, error) {
 	if !IsSHA(hash) {
 		return nil, fmt.Errorf("invalid SHA: %s", hash)
 	}

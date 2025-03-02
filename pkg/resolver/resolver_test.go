@@ -159,7 +159,7 @@ func TestResolver_ResolveFromTagContext(t *testing.T) {
 	a.NoError(resolver.Close())
 }
 
-func TestResolver_ResolveHashContext(t *testing.T) {
+func TestResolver_ResolveFromHashContext(t *testing.T) {
 	a := assert.New(t)
 	r := require.New(t)
 
@@ -227,7 +227,7 @@ func TestResolver_ResolveHashContext(t *testing.T) {
 	}
 	for _, tc := range testCases {
 		for i := 0; i < 2; i++ {
-			gotTags, err := resolver.ResolveHashContext(context.Background(), repo, tc.value)
+			gotTags, err := resolver.ResolveFromHashContext(context.Background(), repo, tc.value)
 			r.NoError(err)
 			a.Len(gotTags, 1)
 
@@ -241,7 +241,7 @@ func TestResolver_ResolveHashContext(t *testing.T) {
 	}
 
 	sha := "1111111111111111111111111111111111111111"
-	_, err = resolver.ResolveHashContext(context.Background(), repo, sha)
+	_, err = resolver.ResolveFromHashContext(context.Background(), repo, sha)
 	r.Error(err)
 
 	a.NoError(resolver.Close())

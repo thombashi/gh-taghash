@@ -185,7 +185,7 @@ func main() {
 	for _, arg := range args {
 		if resolver.IsSHA(arg) {
 			hash := arg
-			gitTags, err := r.ResolveHashContext(ctx, repo, hash)
+			gitTags, err := r.ResolveFromHashContext(ctx, repo, hash)
 			eoe.ExitOnError(err, eoeParams.WithMessage("failed to resolve a hash"))
 
 			for _, gitTag := range gitTags {
